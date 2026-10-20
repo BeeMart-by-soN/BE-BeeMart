@@ -1,10 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection.Metadata;
 
 namespace S1.Model
 {
-    [Table("TrTransaction")]
     public class TrTransaction
     {
         [Key]
@@ -41,7 +39,7 @@ namespace S1.Model
         public string? Userup { get; set; }
 
         [ForeignKey(nameof(IdUser))]
-        public User User {get;set;} = null!;
+        public MsUser User {get;set;} = null!;
 
         [ForeignKey(nameof(IdPaymentMethod))]
         public LtPaymentMethod PaymentMethod {get;set;} = null!;

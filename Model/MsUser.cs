@@ -1,15 +1,12 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace S1.Model
 {
-    [Table("MsUser")]
-    public class User
+    public class MsUser
     {
         [Key]
-        [Column("IdUser")]
         [StringLength(5)]
-        public string UserID { get; set; } = string.Empty;
+        public string IdUser { get; set; } = string.Empty;
 
         [Required]
         [MinLength(3)]
@@ -17,7 +14,7 @@ namespace S1.Model
 
         [Required]
         [MinLength(3)]
-        public string Fullname { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(255)]
@@ -37,6 +34,6 @@ namespace S1.Model
         public DateTime? Dateup { get; set; }
 
         [MaxLength(36)]
-        public string? Userup { get; set; }        
+        public string? Userup { get; set; }
     }
 }

@@ -20,11 +20,11 @@ namespace S1.Controller
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetUserResult>>> Get()
         {
-            var users = await _context.User
+            var users = await _context.MsUser
                         .Select(x => new GetUserResult()
                         {
                             Username = x.Username,
-                            Fullname = x.Fullname,
+                            Fullname = x.FullName,
                         }).ToListAsync();
 
             var response = new ApiResults<IEnumerable<GetUserResult>>
@@ -41,13 +41,13 @@ namespace S1.Controller
         [HttpGet("{id}")]
         public async Task<ActionResult<GetUserResult>> Get(string id)
         {
-            var users = await _context.User
-                        .Where(x => x.UserID == id)
+            var users = await _context.MsUser
+                        .Where(x => x.IdUser == id)
                         .Select(x => new GetUserResult()
                         {
-                            UserID = x.UserID,
+                            UserID = x.IdUser,
                             Username = x.Username,
-                            Fullname = x.Fullname,
+                            Fullname = x.FullName,
                         }).FirstOrDefaultAsync();
             
             if(users == null)
@@ -73,7 +73,7 @@ namespace S1.Controller
                 return BadRequest(ModelState);
             }
 
-            var isUsernameTaken = await _context.User.AnyAsync(x => x.Username == req.Username);
+            var isUsernameTaken = await _context.MsUser.AnyAsync(x => x.Username == req.Username);
 
             if (isUsernameTaken)
             {
@@ -85,18 +85,18 @@ namespace S1.Controller
                 return BadRequest("Password and Re-Password is not same :/");
             }
 
-            var user = new User
+            var user = new MsUser
             {
-                UserID = await GenerateUserId(),
+                IdUser = await GenerateUserId(),
                 Username = req.Username,
-                Fullname = req.Fullname,
+                FullName = req.Fullname,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.Password),
                 Role = req.Role,
                 Datein = DateTime.Now,
                 Userin = User?.Identity?.Name ?? "SYSTEM"
             };
             
-            _context.User.Add(user);
+            _context.MsUser.Add(user);
             await _context.SaveChangesAsync();
 
             return Ok();
@@ -110,10 +110,9 @@ namespace S1.Controller
                 userId = Guid.NewGuid()
                         .ToString("N")[..5]
                         .ToUpper();
-            } while (await _context.User.AnyAsync(x => x.UserID == userId));
+            } while (await _context.MsUser.AnyAsync(x => x.IdUser == userId));
 
             return userId;
         }
     }
 }
-

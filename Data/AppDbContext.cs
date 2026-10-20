@@ -9,9 +9,9 @@ namespace S1.Data
         {
         }
         public DbSet<LtPaymentMethod> LtPaymentMethod { get; set;}
-        public DbSet<Product> Product { get; set; }
-        public DbSet<User> User { get; set; }
-        public DbSet<TrTransaction> Transaction { get; set; }
-        public DbSet<TransactionDetails> TransactionDetail { get; set; }
+        public DbSet<MsProduct> MsProduct { get; set; }
+        public DbSet<MsUser> MsUser { get; set; }
+        public DbSet<TrTransaction> TrTransaction { get; set; }
+        public DbSet<TrTransactionDetail> TrTransactionDetail { get; set; }
     }
 }

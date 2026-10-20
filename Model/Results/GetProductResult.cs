@@ -1,4 +1,4 @@
-public class GetProductResults
+public class GetProductResult
 {
     public string Name { get; set; } = string.Empty;
     public decimal Weight { get; set; }

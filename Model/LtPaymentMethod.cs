@@ -3,13 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace S1.Model
 {
-    [Table("LtPaymentMethod")]
     public class LtPaymentMethod
     {
         [Key]
-        [Column("IdPaymentMethod")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int PaymentMethodID { get; set; }
+        public int IdPaymentMethod { get; set; }
 
         [Required]
         [MaxLength(50)]
