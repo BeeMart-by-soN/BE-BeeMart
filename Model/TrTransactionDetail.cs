@@ -28,7 +28,9 @@ namespace S1.Model
         [Column(TypeName = "decimal(18,2)")]
         public decimal SubTotal { get; set; }
 
-        public bool Stsrc { get; set; }
+        // Default eksplisit true agar EF mengirim nilai pada INSERT (bukan mengandalkan
+        // default constraint DB).
+        public bool Stsrc { get; set; } = true;
 
         public DateTime Datein { get; set; }
 
@@ -39,5 +41,12 @@ namespace S1.Model
 
         [MaxLength(36)]
         public string? Userup { get; set; }
+
+        // Navigation
+        [ForeignKey(nameof(IdTransaction))]
+        public TrTransaction Transaction { get; set; } = null!;
+
+        [ForeignKey(nameof(IdProduct))]
+        public MsProduct Product { get; set; } = null!;
     }
 }

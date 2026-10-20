@@ -1,5 +1,8 @@
+namespace S1.Model.Results;
+
 public class GetProductResult
 {
+    public string IdProduct { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public decimal Weight { get; set; }
     public int Stock { get; set; }

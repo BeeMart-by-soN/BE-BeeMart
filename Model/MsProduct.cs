@@ -26,7 +26,9 @@ namespace S1.Model
         [Column(TypeName = "decimal(5,2)")]
         public decimal Discount { get; set; }
 
-        public bool Stsrc { get; set; }
+        // Default eksplisit true agar EF mengirim nilai pada INSERT (bukan mengandalkan
+        // default constraint DB).
+        public bool Stsrc { get; set; } = true;
 
         public DateTime Datein { get; set; }
 
@@ -38,5 +40,8 @@ namespace S1.Model
 
         [MaxLength(36)]
         public string? Userup { get; set; }
+
+        // Navigation: item transaksi yang memakai produk ini (1 — N)
+        public ICollection<TrTransactionDetail> TransactionDetails { get; set; } = new List<TrTransactionDetail>();
     }
 }

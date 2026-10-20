@@ -1,118 +1,60 @@
-using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using S1.Data;
-using S1.Model;
 using S1.Model.Results;
 
-namespace S1.Controller
+namespace S1.Controller;
+
+[Authorize]
+[Route("api/v1/[controller]")]
+[ApiController]
+public class UserController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UserController : ControllerBase
+    private readonly AppDbContext _context;
+
+    public UserController(AppDbContext context)
     {
-        private readonly AppDbContext _context;
+        _context = context;
+    }
 
-        public UserController(AppDbContext context)
-        { _context = context; }
-
-        // GET: /api/<StudentController>
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetUserResult>>> Get()
-        {
-            var users = await _context.MsUser
-                        .Select(x => new GetUserResult()
-                        {
-                            Username = x.Username,
-                            Fullname = x.FullName,
-                        }).ToListAsync();
-
-            var response = new ApiResults<IEnumerable<GetUserResult>>
+    // GET: /api/v1/User — daftar user (hanya Admin)
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<ActionResult<ApiResponse<IEnumerable<GetUserResult>>>> Get()
+    {
+        var users = await _context.MsUser
+            .Where(x => x.Stsrc)
+            .Select(x => new GetUserResult
             {
-                StatusCode = StatusCodes.Status200OK,
-                RequestMethod = HttpContext.Request.Method,
-                Data = users
-            };
+                UserId = x.IdUser,
+                Username = x.Username,
+                Fullname = x.FullName
+            })
+            .ToListAsync();
 
-            return Ok(response);
+        return Ok(ApiResponse<IEnumerable<GetUserResult>>.Ok(users));
+    }
+
+    // GET: /api/v1/User/{id}
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ApiResponse<GetUserResult>>> Get(string id)
+    {
+        var user = await _context.MsUser
+            .Where(x => x.IdUser == id && x.Stsrc)
+            .Select(x => new GetUserResult
+            {
+                UserId = x.IdUser,
+                Username = x.Username,
+                Fullname = x.FullName
+            })
+            .FirstOrDefaultAsync();
+
+        if (user == null)
+        {
+            return NotFound(ApiResponse<GetUserResult>.Fail("User not found"));
         }
 
-        //GET: /api/<StudentController>/:id
-        [HttpGet("{id}")]
-        public async Task<ActionResult<GetUserResult>> Get(string id)
-        {
-            var users = await _context.MsUser
-                        .Where(x => x.IdUser == id)
-                        .Select(x => new GetUserResult()
-                        {
-                            UserID = x.IdUser,
-                            Username = x.Username,
-                            Fullname = x.FullName,
-                        }).FirstOrDefaultAsync();
-            
-            if(users == null)
-            {
-                return NotFound("User not found :/");
-            }
-
-            var response = new ApiResults<GetUserResult>
-            {
-                StatusCode = StatusCodes.Status200OK,
-                RequestMethod = HttpContext.Request.Method,
-                Data = users
-            };
-            return Ok(response);
-        }
-
-        //POST: /api/<StudentController>
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CreateUserRequest req)
-        {
-            if(!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var isUsernameTaken = await _context.MsUser.AnyAsync(x => x.Username == req.Username);
-
-            if (isUsernameTaken)
-            {
-                return BadRequest("Username already exists.");
-            }
-
-            if (req.Password != req.RePassword)
-            {
-                return BadRequest("Password and Re-Password is not same :/");
-            }
-
-            var user = new MsUser
-            {
-                IdUser = await GenerateUserId(),
-                Username = req.Username,
-                FullName = req.Fullname,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.Password),
-                Role = req.Role,
-                Datein = DateTime.Now,
-                Userin = User?.Identity?.Name ?? "SYSTEM"
-            };
-            
-            _context.MsUser.Add(user);
-            await _context.SaveChangesAsync();
-
-            return Ok();
-        }
-
-        private async Task<string> GenerateUserId()
-        {
-            string userId;
-            do
-            {
-                userId = Guid.NewGuid()
-                        .ToString("N")[..5]
-                        .ToUpper();
-            } while (await _context.MsUser.AnyAsync(x => x.IdUser == userId));
-
-            return userId;
-        }
+        return Ok(ApiResponse<GetUserResult>.Ok(user));
     }
 }

@@ -23,7 +23,7 @@ namespace S1.Model
         [Required]
         public string Role { get; set; } = string.Empty;
 
-        public bool Stsrc { get; set; }
+        public bool Stsrc { get; set; } = true;
 
         public DateTime Datein { get; set; }
 
@@ -35,5 +35,11 @@ namespace S1.Model
 
         [MaxLength(36)]
         public string? Userup { get; set; }
+
+        // Selalu diisi true untuk data aktif. Nilai default eksplisit (bukan hanya
+        // default constraint DB) agar Entity Framework benar-benar mengirim nilai
+        // pada INSERT — tanpa ini INSERT gagal: "Cannot insert the value NULL into
+        // column 'Stsrc'".
+        public ICollection<TrTransaction> Transactions { get; set; } = new List<TrTransaction>();
     }
 }

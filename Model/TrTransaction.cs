@@ -25,7 +25,9 @@ namespace S1.Model
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalPrice {get;set;}
 
-        public bool Stsrc { get; set; }
+        // Default eksplisit true agar EF mengirim nilai pada INSERT (bukan mengandalkan
+        // default constraint DB).
+        public bool Stsrc { get; set; } = true;
 
         public DateTime Datein { get; set; }
 
@@ -39,9 +41,12 @@ namespace S1.Model
         public string? Userup { get; set; }
 
         [ForeignKey(nameof(IdUser))]
-        public MsUser User {get;set;} = null!;
+        public MsUser User { get; set; } = null!;
 
         [ForeignKey(nameof(IdPaymentMethod))]
-        public LtPaymentMethod PaymentMethod {get;set;} = null!;
+        public LtPaymentMethod PaymentMethod { get; set; } = null!;
+
+        // Navigation: rincian item dari transaksi ini (1 — N, CASCADE delete)
+        public ICollection<TrTransactionDetail> Details { get; set; } = new List<TrTransactionDetail>();
     }
 }
